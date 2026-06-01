@@ -310,9 +310,9 @@ async function submitForm() {
   const maName = document.getElementById('f-ma-name').value.trim();
   const msg = document.getElementById('form-msg');
 
-  if (!title || !dzName || !maName) {
+  if (!title || (!dzName && !maName)) {
     msg.className = 'form-msg msg-err';
-    msg.textContent = 'Fill in: title, DZ name, MA name';
+    msg.textContent = 'Fill in: title and at least one rapper name';
     return;
   }
 
