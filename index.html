@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DZ vs MA — Maghreb Rap Beef Tracker 2026. Vote for who's winning the mic war.">
+<title>DZ vs MA — Rap Beef Tracker 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@600;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NOISE OVERLAY -->
+<div class="noise" aria-hidden="true"></div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursor-trail"></div>
+
+<!-- TICKER -->
+<div class="ticker-wrap" role="marquee" aria-label="Live updates">
+  <div class="ticker-inner" id="ticker-inner">
+    <span>🔥 BREAKING — Trap King drops JUGURTHA — May 27, 2026</span>
+    <span class="sep">///</span>
+    <span class="dz-c">241K views in 4 days 🇩🇿</span>
+    <span class="sep">///</span>
+    <span>Diib fires back with TRAPPINK 🇲🇦</span>
+    <span class="sep">///</span>
+    <span class="dz-c">Youppi drops بوخوص — precision strike on Diib 🇩🇿</span>
+    <span class="sep">///</span>
+    <span>War is LIVE — cast your vote</span>
+    <span class="sep">///</span>
+    <span>🔥 BREAKING — Trap King drops JUGURTHA — May 27, 2026</span>
+    <span class="sep">///</span>
+    <span class="dz-c">241K views in 4 days 🇩🇿</span>
+    <span class="sep">///</span>
+    <span>Diib fires back with TRAPPINK 🇲🇦</span>
+    <span class="sep">///</span>
+    <span class="dz-c">Youppi drops بوخوص — precision strike on Diib 🇩🇿</span>
+    <span class="sep">///</span>
+    <span>War is LIVE — cast your vote</span>
+    <span class="sep">///</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-orb hero-orb-dz"></div>
+    <div class="hero-orb hero-orb-ma"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <p class="eyebrow reveal">🎤 Maghreb Rap War · 2026</p>
+    <h1 class="logo reveal reveal-delay-1">
+      <span class="logo-dz">DZ</span>
+      <span class="logo-vs">VS</span>
+      <span class="logo-ma">MA</span>
+    </h1>
+    <p class="hero-sub reveal reveal-delay-2">Who's really winning the mic war?</p>
+    <a href="#beefs" class="hero-cta reveal reveal-delay-3">Vote Now ↓</a>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">scroll</div>
+</header>
+
+<!-- SCOREBOARD -->
+<section class="scoreboard-section reveal-section">
+  <div class="container">
+    <div class="scoreboard">
+      <div class="score-side dz-side">
+        <div class="score-flag">🇩🇿</div>
+        <div class="score-country">Algérie</div>
+        <div class="score-num count-up" id="dz-total" data-target="0">0</div>
+        <div class="score-label">votes</div>
+      </div>
+      <div class="score-divider">
+        <div class="score-colon">:</div>
+        <div class="score-status" id="score-status">—</div>
+      </div>
+      <div class="score-side ma-side">
+        <div class="score-flag">🇲🇦</div>
+        <div class="score-country">Maroc</div>
+        <div class="score-num count-up" id="ma-total" data-target="0">0</div>
+        <div class="score-label">votes</div>
+      </div>
+    </div>
+    <div class="war-bar-wrap">
+      <div class="war-bar">
+        <div class="war-fill-dz" id="war-fill-dz" style="width:50%">
+          <div class="war-shimmer"></div>
+        </div>
+        <div class="war-fill-ma">
+          <div class="war-shimmer"></div>
+        </div>
+      </div>
+      <div class="war-bar-labels">
+        <span class="dz-c" id="war-pct-dz">50%</span>
+        <span class="war-bar-title">OVERALL WAR STATUS</span>
+        <span class="ma-c" id="war-pct-ma">50%</span>
+      </div>
+    </div>
+    <p class="total-votes" id="total-votes">Loading votes...</p>
+  </div>
+</section>
+
+<!-- BEEFS -->
+<section class="beefs-section" id="beefs">
+  <div class="container">
+    <h2 class="section-title reveal-section">
+      <span class="section-title-line"></span>
+      Active Beefs
+      <span class="section-title-line"></span>
+    </h2>
+    <div class="beef-list" id="beef-list">
+      <div class="loading-state">
+        <div class="loading-bar"></div>
+        <p>Loading beefs...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VOTE TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<footer class="site-footer">
+  <p>🎤 DZ vs MA · Rap Beef Tracker 2026 · <span id="footer-votes">0</span> votes cast</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

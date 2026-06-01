@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — DZ vs MA Beef Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--dz:#006233;--ma:#C1272D;--fire:#ff3c00;--gold:#c9a227;--bg:#060606;--card:#0d0d0d;--border:#1e1e1e;--muted:#555;--text:#e8e8e8}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{border:1px solid var(--border);background:var(--card);padding:3rem 2.5rem;width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;margin-bottom:.3rem}
+.login-logo .dz{color:var(--dz)}.login-logo .vs{color:var(--fire);font-size:.55em;vertical-align:middle}.login-logo .ma{color:var(--ma)}
+.login-sub{font-size:9px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:2rem}
+.login-box input{width:100%;background:#111;border:1px solid var(--border);color:#fff;padding:.7rem 1rem;font-family:'Space Mono',monospace;font-size:13px;outline:none;margin-bottom:1rem;text-align:center;letter-spacing:4px}
+.login-box input:focus{border-color:var(--fire)}
+.btn-login{width:100%;background:var(--fire);border:none;color:#fff;padding:.7rem;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;cursor:pointer;transition:opacity .15s}
+.btn-login:hover{opacity:.85}
+.login-err{font-size:10px;color:var(--ma);margin-top:.8rem;letter-spacing:1px;min-height:16px}
+
+/* ADMIN PANEL */
+#admin-panel{display:none}
+.admin-header{border-bottom:1px solid var(--border);padding:1.2rem 0;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between}
+.admin-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:4px}
+.admin-title .dz{color:var(--dz)}.admin-title .ma{color:var(--ma)}.admin-title .fire{color:var(--fire)}
+.btn-logout{font-size:9px;letter-spacing:2px;color:var(--muted);border:1px solid var(--border);padding:.4rem .8rem;background:none;cursor:pointer;text-transform:uppercase;font-family:'Space Mono',monospace}
+.btn-logout:hover{color:#fff;border-color:var(--muted)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem}
+.stat-card{background:var(--card);border:1px solid var(--border);padding:1rem;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1}
+.stat-num.dz-c{color:var(--dz)}.stat-num.ma-c{color:var(--ma)}.stat-num.fire-c{color:var(--fire)}
+.stat-lbl{font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+
+/* FORM */
+.form-section{border:1px solid var(--border);background:var(--card);padding:1.5rem;margin-bottom:2.5rem}
+.form-section h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;margin-bottom:1.5rem;color:#fff}
+.form-section h2 .accent{color:var(--fire)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.fg input,.fg select,.fg textarea{background:#111;border:1px solid var(--border);color:#eee;padding:.5rem .7rem;font-family:'Space Mono',monospace;font-size:11px;outline:none;width:100%;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--fire)}
+.fg textarea{resize:vertical;min-height:80px}
+.fg select option{background:#111}
+.side-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.side-block{border:1px solid var(--border);padding:1rem;display:flex;flex-direction:column;gap:.7rem}
+.side-block.dz-block{border-color:rgba(0,98,51,.3)}.side-title.dz-t{color:var(--dz);font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:.3rem}
+.side-block.ma-block{border-color:rgba(193,39,45,.3)}.side-title.ma-t{color:var(--ma);font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:.3rem}
+.track-inputs{display:flex;flex-direction:column;gap:.4rem}
+.track-row{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.btn-add-track{background:none;border:1px dashed var(--border);color:var(--muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;padding:.4rem;cursor:pointer;width:100%;margin-top:.3rem;transition:all .15s}
+.btn-add-track:hover{border-color:var(--fire);color:var(--fire)}
+.btn-remove-track{background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 .4rem;line-height:1;align-self:center}
+.btn-remove-track:hover{color:var(--ma)}
+.form-actions{margin-top:1.2rem;display:flex;gap:.8rem;align-items:center}
+.btn-submit{background:var(--fire);border:none;color:#fff;padding:.65rem 2rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:opacity .15s;flex-shrink:0}
+.btn-submit:hover{opacity:.85}
+.btn-submit:disabled{opacity:.35;cursor:default}
+.btn-reset{background:none;border:1px solid var(--border);color:var(--muted);padding:.65rem 1.2rem;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .15s}
+.btn-reset:hover{border-color:var(--muted);color:#fff}
+.form-msg{font-size:10px;letter-spacing:1px}
+.msg-ok{color:#4ade80}.msg-err{color:var(--ma)}
+
+/* BEEF TABLE */
+.beef-table-section{border:1px solid var(--border);background:var(--card);padding:1.5rem}
+.beef-table-section h2{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;margin-bottom:1.2rem}
+.beef-table{width:100%;border-collapse:collapse;font-size:11px}
+.beef-table th{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border)}
+.beef-table td{padding:.6rem .7rem;border-bottom:1px solid #111;vertical-align:middle}
+.beef-table tr:hover td{background:#111}
+.badge{font-size:8px;letter-spacing:2px;padding:2px 6px;border:1px solid}
+.b-hot{border-color:var(--fire);color:var(--fire)}.b-on{border-color:#f59e0b;color:#f59e0b}.b-done{border-color:var(--muted);color:var(--muted)}
+.tbl-title{color:#ccc;font-weight:700}
+.tbl-votes-dz{color:var(--dz)}.tbl-votes-ma{color:var(--ma)}
+.btn-edit{background:none;border:1px solid var(--border);color:var(--muted);font-size:9px;letter-spacing:1px;padding:3px 8px;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s}
+.btn-edit:hover{border-color:#fff;color:#fff}
+.btn-delete{background:none;border:1px solid rgba(193,39,45,.2);color:var(--ma);font-size:9px;letter-spacing:1px;padding:3px 8px;cursor:pointer;font-family:'Space Mono',monospace;margin-left:.4rem;transition:all .15s}
+.btn-delete:hover{background:var(--ma);color:#fff}
+.loading-row td{color:var(--muted);text-align:center;padding:2rem}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><span class="dz">DZ</span><span class="vs">VS</span><span class="ma">MA</span></div>
+    <p class="login-sub">Admin Panel</p>
+    <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Enter</button>
+    <p class="login-err" id="login-err"></p>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="container">
+
+    <div class="admin-header">
+      <div class="admin-title">
+        <span class="dz">DZ</span><span class="fire"> VS </span><span class="ma">MA</span>
+        — Admin
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num fire-c" id="stat-beefs">0</div>
+        <div class="stat-lbl">Total Beefs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num dz-c" id="stat-dz">0</div>
+        <div class="stat-lbl">DZ Votes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num ma-c" id="stat-ma">0</div>
+        <div class="stat-lbl">MA Votes</div>
+      </div>
+    </div>
+
+    <!-- ADD/EDIT FORM -->
+    <div class="form-section">
+      <h2 id="form-heading">+ Add New <span class="accent">Beef</span></h2>
+
+      <input type="hidden" id="edit-id">
+
+      <div class="form-grid">
+        <div class="fg full"><label>Beef Title *</label><input type="text" id="f-title" placeholder="e.g. Trap King - JUGURTHA vs tout le Maroc" maxlength="100"></div>
+        <div class="fg"><label>Status *</label>
+          <select id="f-status">
+            <option value="hot">🔥 Hot / Just Dropped</option>
+            <option value="ongoing">⚡ Ongoing</option>
+            <option value="settled">✅ Settled</option>
+          </select>
+        </div>
+        <div class="fg"><label>Context / Views</label><input type="text" id="f-views" placeholder="241K views · May 27, 2026" maxlength="80"></div>
+        <div class="fg full"><label>Description</label><textarea id="f-desc" placeholder="What started this beef? What happened?"></textarea></div>
+        <div class="fg"><label>Mark as fresh (new drop)?</label>
+          <select id="f-fresh">
+            <option value="true">Yes — show 🚨 FRESH banner</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="side-grid">
+        <div class="side-block dz-block">
+          <div class="side-title dz-t">🇩🇿 DZ Rapper</div>
+          <div class="fg"><label>Name *</label><input type="text" id="f-dz-name" placeholder="Trap King" maxlength="60"></div>
+          <div class="fg"><label>City / Handle</label><input type="text" id="f-dz-sub" placeholder="Algérie 🇩🇿 — Trap Throne" maxlength="80"></div>
+          <div class="fg"><label>Short Bio</label><textarea id="f-dz-bio" placeholder="Brief description..." style="min-height:60px"></textarea></div>
+          <div class="fg"><label>Tracks (name + YouTube URL)</label>
+            <div id="dz-tracks" class="track-inputs"></div>
+            <button class="btn-add-track" onclick="addTrackRow('dz')">+ Add Track</button>
+          </div>
+        </div>
+        <div class="side-block ma-block">
+          <div class="side-title ma-t">🇲🇦 MA Rapper</div>
+          <div class="fg"><label>Name *</label><input type="text" id="f-ma-name" placeholder="Diib" maxlength="60"></div>
+          <div class="fg"><label>City / Handle</label><input type="text" id="f-ma-sub" placeholder="Mrirt 🇲🇦 — Le Loup" maxlength="80"></div>
+          <div class="fg"><label>Short Bio</label><textarea id="f-ma-bio" placeholder="Brief description..." style="min-height:60px"></textarea></div>
+          <div class="fg"><label>Tracks (name + YouTube URL)</label>
+            <div id="ma-tracks" class="track-inputs"></div>
+            <button class="btn-add-track" onclick="addTrackRow('ma')">+ Add Track</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-submit" id="btn-submit" onclick="submitForm()">+ SAVE BEEF</button>
+        <button class="btn-reset" onclick="resetForm()">Clear Form</button>
+        <span class="form-msg" id="form-msg"></span>
+      </div>
+    </div>
+
+    <!-- BEEFS TABLE -->
+    <div class="beef-table-section">
+      <h2>All Beefs</h2>
+      <table class="beef-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>DZ Votes</th>
+            <th>MA Votes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="beef-tbody">
+          <tr class="loading-row"><td colspan="5">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let beefs = [], votes = {}, isEditing = false;
+
+// ─── AUTH ───
+function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  const err = document.getElementById('login-err');
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    sessionStorage.setItem('dzma_admin', '1');
+    initAdmin();
+  } else {
+    err.textContent = 'Wrong password';
+    setTimeout(() => err.textContent = '', 2000);
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('dzma_admin');
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+}
+
+if (sessionStorage.getItem('dzma_admin')) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  initAdmin();
+}
+
+// ─── TRACK ROWS ───
+function addTrackRow(side, name = '', url = '') {
+  const container = document.getElementById(side + '-tracks');
+  const row = document.createElement('div');
+  row.className = 'track-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Track name" value="${name.replace(/"/g,'&quot;')}" class="track-name-input">
+    <input type="url" placeholder="YouTube URL" value="${url.replace(/"/g,'&quot;')}" class="track-url-input">
+    <button class="btn-remove-track" onclick="this.parentElement.remove()">×</button>`;
+  container.appendChild(row);
+}
+
+function getTracksFromContainer(side) {
+  const rows = document.querySelectorAll(`#${side}-tracks .track-row`);
+  return Array.from(rows).map(row => ({
+    name: row.querySelector('.track-name-input').value.trim(),
+    url: row.querySelector('.track-url-input').value.trim() || null
+  })).filter(t => t.name);
+}
+
+// ─── FORM ───
+function resetForm() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-status').value = 'hot';
+  document.getElementById('f-views').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-fresh').value = 'true';
+  ['dz','ma'].forEach(side => {
+    document.getElementById(`f-${side}-name`).value = '';
+    document.getElementById(`f-${side}-sub`).value = '';
+    document.getElementById(`f-${side}-bio`).value = '';
+    document.getElementById(`${side}-tracks`).innerHTML = '';
+  });
+  document.getElementById('form-heading').innerHTML = '+ Add New <span class="accent">Beef</span>';
+  document.getElementById('btn-submit').textContent = '+ SAVE BEEF';
+  document.getElementById('form-msg').textContent = '';
+  isEditing = false;
+}
+
+function loadIntoForm(b) {
+  isEditing = true;
+  document.getElementById('edit-id').value = b.id;
+  document.getElementById('f-title').value = b.title || '';
+  document.getElementById('f-status').value = b.status || 'hot';
+  document.getElementById('f-views').value = b.views || '';
+  document.getElementById('f-desc').value = b.description || '';
+  document.getElementById('f-fresh').value = b.is_fresh ? 'true' : 'false';
+  document.getElementById('f-dz-name').value = b.dz_name || '';
+  document.getElementById('f-dz-sub').value = b.dz_sub || '';
+  document.getElementById('f-dz-bio').value = b.dz_bio || '';
+  document.getElementById('f-ma-name').value = b.ma_name || '';
+  document.getElementById('f-ma-sub').value = b.ma_sub || '';
+  document.getElementById('f-ma-bio').value = b.ma_bio || '';
+  document.getElementById('dz-tracks').innerHTML = '';
+  document.getElementById('ma-tracks').innerHTML = '';
+  const dzT = typeof b.dz_tracks === 'string' ? JSON.parse(b.dz_tracks) : (b.dz_tracks || []);
+  const maT = typeof b.ma_tracks === 'string' ? JSON.parse(b.ma_tracks) : (b.ma_tracks || []);
+  dzT.forEach(t => addTrackRow('dz', t.name, t.url || ''));
+  maT.forEach(t => addTrackRow('ma', t.name, t.url || ''));
+  document.getElementById('form-heading').innerHTML = '✏️ Edit <span class="accent">Beef</span>';
+  document.getElementById('btn-submit').textContent = '✓ UPDATE BEEF';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function submitForm() {
+  const title = document.getElementById('f-title').value.trim();
+  const dzName = document.getElementById('f-dz-name').value.trim();
+  const maName = document.getElementById('f-ma-name').value.trim();
+  const msg = document.getElementById('form-msg');
+
+  if (!title || !dzName || !maName) {
+    msg.className = 'form-msg msg-err';
+    msg.textContent = 'Fill in: title, DZ name, MA name';
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  msg.textContent = '';
+
+  const payload = {
+    title,
+    status: document.getElementById('f-status').value,
+    views: document.getElementById('f-views').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    is_fresh: document.getElementById('f-fresh').value === 'true',
+    dz_name: dzName,
+    dz_sub: document.getElementById('f-dz-sub').value.trim(),
+    dz_bio: document.getElementById('f-dz-bio').value.trim(),
+    dz_tracks: JSON.stringify(getTracksFromContainer('dz')),
+    ma_name: maName,
+    ma_sub: document.getElementById('f-ma-sub').value.trim(),
+    ma_bio: document.getElementById('f-ma-bio').value.trim(),
+    ma_tracks: JSON.stringify(getTracksFromContainer('ma'))
+  };
+
+  let error;
+  const editId = document.getElementById('edit-id').value;
+
+  if (isEditing && editId) {
+    ({ error } = await supabase.from('beefs').update(payload).eq('id', editId));
+  } else {
+    ({ error } = await supabase.from('beefs').insert(payload));
+  }
+
+  btn.disabled = false;
+
+  if (error) {
+    msg.className = 'form-msg msg-err';
+    msg.textContent = 'Error: ' + error.message;
+  } else {
+    msg.className = 'form-msg msg-ok';
+    msg.textContent = isEditing ? '✓ Beef updated!' : '✓ Beef added!';
+    resetForm();
+    loadBeefs();
+    setTimeout(() => msg.textContent = '', 3000);
+  }
+}
+
+async function deleteBeef(id, title) {
+  if (!confirm(`Delete "${title}"?\n\nThis will also delete all its votes.`)) return;
+  await supabase.from('votes').delete().eq('beef_id', id);
+  await supabase.from('beefs').delete().eq('id', id);
+  loadBeefs();
+}
+
+// ─── LOAD DATA ───
+async function loadBeefs() {
+  const { data } = await supabase.from('beefs').select('*').order('created_at', { ascending: false });
+  beefs = data || [];
+
+  const { data: vData } = await supabase.from('votes').select('beef_id, side');
+  votes = {};
+  (vData || []).forEach(row => {
+    if (!votes[row.beef_id]) votes[row.beef_id] = { dz: 0, ma: 0 };
+    votes[row.beef_id][row.side]++;
+  });
+
+  renderTable();
+  updateStats();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('beef-tbody');
+  if (!beefs.length) {
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="5" style="color:var(--muted)">No beefs yet. Add one above.</td></tr>';
+    return;
+  }
+  const statusMap = { hot: 'b-hot', ongoing: 'b-on', settled: 'b-done' };
+  const labelMap = { hot: '🔥 LIVE', ongoing: '⚡ ON', settled: '✅ DONE' };
+  tbody.innerHTML = beefs.map(b => {
+    const v = votes[b.id] || { dz: 0, ma: 0 };
+    const cls = statusMap[b.status] || 'b-done';
+    const lbl = labelMap[b.status] || b.status;
+    return `<tr>
+      <td class="tbl-title">${b.title || ''}${b.is_fresh ? ' 🚨' : ''}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td class="tbl-votes-dz">${v.dz.toLocaleString()}</td>
+      <td class="tbl-votes-ma">${v.ma.toLocaleString()}</td>
+      <td>
+        <button class="btn-edit" onclick="loadIntoForm(beefs.find(x=>x.id==='${b.id}'))">Edit</button>
+        <button class="btn-delete" onclick="deleteBeef('${b.id}', '${(b.title||'').replace(/'/g,"\\'")}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  let dz = 0, ma = 0;
+  Object.values(votes).forEach(v => { dz += v.dz; ma += v.ma; });
+  document.getElementById('stat-beefs').textContent = beefs.length;
+  document.getElementById('stat-dz').textContent = dz.toLocaleString();
+  document.getElementById('stat-ma').textContent = ma.toLocaleString();
+}
+
+async function initAdmin() {
+  addTrackRow('dz'); addTrackRow('ma');
+  await loadBeefs();
+}
+</script>
+</body>
+</html>
