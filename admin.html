@@ -208,7 +208,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let beefs = [], votes = {}, isEditing = false;
 
 // ─── AUTH ───
@@ -340,9 +340,9 @@ async function submitForm() {
   const editId = document.getElementById('edit-id').value;
 
   if (isEditing && editId) {
-    ({ error } = await supabase.from('beefs').update(payload).eq('id', editId));
+    ({ error } = await db.from('beefs').update(payload).eq('id', editId));
   } else {
-    ({ error } = await supabase.from('beefs').insert(payload));
+    ({ error } = await db.from('beefs').insert(payload));
   }
 
   btn.disabled = false;
@@ -361,17 +361,17 @@ async function submitForm() {
 
 async function deleteBeef(id, title) {
   if (!confirm(`Delete "${title}"?\n\nThis will also delete all its votes.`)) return;
-  await supabase.from('votes').delete().eq('beef_id', id);
-  await supabase.from('beefs').delete().eq('id', id);
+  await db.from('votes').delete().eq('beef_id', id);
+  await db.from('beefs').delete().eq('id', id);
   loadBeefs();
 }
 
 // ─── LOAD DATA ───
 async function loadBeefs() {
-  const { data } = await supabase.from('beefs').select('*').order('created_at', { ascending: false });
+  const { data } = await db.from('beefs').select('*').order('created_at', { ascending: false });
   beefs = data || [];
 
-  const { data: vData } = await supabase.from('votes').select('beef_id, side');
+  const { data: vData } = await db.from('votes').select('beef_id, side');
   votes = {};
   (vData || []).forEach(row => {
     if (!votes[row.beef_id]) votes[row.beef_id] = { dz: 0, ma: 0 };

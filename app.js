@@ -1,5 +1,5 @@
 // ─── SUPABASE CLIENT ───
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── STATE ───
 let beefs = [];
@@ -30,7 +30,7 @@ function saveMyVote(beefId, side) {
 
 // ─── FETCH BEEFS ───
 async function fetchBeefs() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('beefs')
     .select('*')
     .order('created_at', { ascending: false });
@@ -41,7 +41,7 @@ async function fetchBeefs() {
 
 // ─── FETCH VOTE TOTALS ───
 async function fetchVotes() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from('votes')
     .select('beef_id, side');
 
@@ -72,7 +72,7 @@ async function castVote(beefId, side) {
   showToast(side === 'dz' ? '🇩🇿 Voted DZ!' : '🇲🇦 Voted MA!', side);
 
   // Persist to Supabase
-  const { error } = await supabase.from('votes').insert({
+  const { error } = await db.from('votes').insert({
     beef_id: beefId,
     side: side,
     voter_id: VOTER_ID
@@ -93,7 +93,7 @@ async function castVote(beefId, side) {
 
 // ─── REALTIME SUBSCRIPTION ───
 function subscribeToVotes() {
-  supabase
+  db
     .channel('votes-channel')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'votes' }, payload => {
       const { beef_id, side, voter_id } = payload.new;
